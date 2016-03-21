@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Space Invaders",
   "scripts": {
-		"build": "webpack",
+    "build": "webpack",
     "build:prod": "NODE_ENV=production webpack -p"
   },
   "repository": {
@@ -19,9 +19,12 @@
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-loader": "^6.2.4",
-    "webpack": "^1.12.14"
+    "webpack": "^1.12.14",
+    "webpack-dev-server": "^1.14.1"
   },
-	"babel": {
-		"presets": ["es2015"]
-	}
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  }
 }
