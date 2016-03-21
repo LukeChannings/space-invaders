@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Space Invaders",
   "scripts": {
+    "start": "webpack-dev-server --inline --hot",
     "build": "webpack",
     "build:prod": "NODE_ENV=production webpack -p"
   },
@@ -26,5 +27,8 @@
     "presets": [
       "es2015"
     ]
+  },
+  "dependencies": {
+    "kefir": "^3.2.1"
   }
 }
