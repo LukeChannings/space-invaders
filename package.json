@@ -1,0 +1,15 @@
+{
+  "name": "space-invaders",
+  "version": "1.0.0",
+  "description": "Space Invaders",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/Luke-Channings/space-invaders-frp.git"
+  },
+  "keywords": [
+    "FRP"
+  ],
+  "author": "Luke Channings",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/Luke-Channings/space-invaders-frp#readme"
+}
