@@ -2,6 +2,10 @@
   "name": "space-invaders",
   "version": "1.0.0",
   "description": "Space Invaders",
+  "scripts": {
+		"build": "webpack",
+    "build:prod": "NODE_ENV=production webpack -p"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@bitbucket.org/Luke-Channings/space-invaders-frp.git"
@@ -11,5 +15,13 @@
   ],
   "author": "Luke Channings",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/Luke-Channings/space-invaders-frp#readme"
+  "homepage": "https://bitbucket.org/Luke-Channings/space-invaders-frp#readme",
+  "devDependencies": {
+    "babel-core": "^6.7.2",
+    "babel-loader": "^6.2.4",
+    "webpack": "^1.12.14"
+  },
+	"babel": {
+		"presets": ["es2015"]
+	}
 }
