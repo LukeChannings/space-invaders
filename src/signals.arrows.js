@@ -28,3 +28,6 @@ export const arrowsPressed$ =
     keyPressed$(37),
     keyPressed$(39),
   ])
+
+export const spaceBarPressed$ =
+  keyPressed$(32)

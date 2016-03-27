@@ -9,7 +9,6 @@ import view from './view'
 
 const vdom$ = model$.map(view)
 model$.log(`model$`)
-vdom$.log(`vdom$`)
 
 vdom$
   .take(1)
