@@ -11,7 +11,7 @@ module.exports = {
     devtoolModuleFilenameTemplate: `[resource-path]`,
     devtoolFallbackModuleFilenameTemplate: `[resource-path]?[hash]`
   },
-  devtool: ENV === `production` ? `source-map` : `#cheap-module-eval-source-map`,
+  devtool: ENV === `production` ? `source-map` : `#eval`,
   module: {
     loaders: [
       {

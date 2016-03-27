@@ -20,12 +20,18 @@ const cannonPosition$ =
     } else {
       return prev
     }
-  }, 50)
+  }, 50).toProperty(() => 50)
 
-export default combine([
+const streams = [
   cannonPosition$,
-], (cannonPosition$) => {
+]
+
+const mapStreamStructure = (
+  cannonPosition
+) => {
   return {
-    cannonPosition: cannonPosition$,
+    cannonPosition,
   }
-})
+}
+
+export default combine(streams, mapStreamStructure).toProperty()
