@@ -1,7 +1,6 @@
 {
   "extends": [
-    "standard",
-    "plugin:react/recommended"
+    "standard"
   ],
   "parser": "babel-eslint",
   "parserOptions": {
@@ -11,13 +10,12 @@
           "jsx": true
       },
   },
-  "plugins": [
-    "react"
-  ],
   "rules": {
     "strict": 0,
     "quotes": [2, "backtick", "avoid-escape"],
     "comma-dangle": [2, "only-multiline"],
-    "indent": [2, 2]
+    "indent": [2, 2],
+    "no-unused-vars": [2, { "varsIgnorePattern": "h" }],
+    "dot-location": 0
   }
 }
