@@ -2,7 +2,7 @@ const path = require(`path`)
 const ENV = process.env.NODE_ENV || `development`
 
 module.exports = {
-  entry: path.resolve(`./src/space-invaders`),
+  entry: path.resolve(`./src/main`),
   output: {
     path: path.resolve(`./dist`),
     publicPath: `/dist`,

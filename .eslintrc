@@ -16,6 +16,6 @@
     "comma-dangle": [2, "only-multiline"],
     "indent": [2, 2],
     "no-unused-vars": [2, { "varsIgnorePattern": "h" }],
-    "dot-location": 0
+    "comma-style": 0,
   }
 }

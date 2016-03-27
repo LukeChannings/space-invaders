@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.cannon {
+  position: absolute;
+  bottom: 20px;
+  width: 50px;
+  height: 30px;
+  background: red;
+}
