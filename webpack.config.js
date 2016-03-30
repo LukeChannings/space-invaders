@@ -17,7 +17,10 @@ module.exports = {
       {
         test: /\.js$/,
         loader: `babel`,
-        include: path.resolve(`./src`)
+        include: [
+          path.resolve(`./src`),
+          path.resolve(`./node_modules/rxjs-es`),
+        ]
       }
     ]
   },

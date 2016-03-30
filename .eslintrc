@@ -12,10 +12,10 @@
   },
   "rules": {
     "strict": 0,
-    "quotes": [2, "backtick", "avoid-escape"],
     "comma-dangle": [2, "only-multiline"],
     "indent": [2, 2],
     "no-unused-vars": [2, { "varsIgnorePattern": "h" }],
     "comma-style": 0,
+    "new-parens": 0,
   }
 }
