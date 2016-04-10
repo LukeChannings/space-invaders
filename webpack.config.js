@@ -2,7 +2,7 @@ const path = require(`path`)
 const ENV = process.env.NODE_ENV || `development`
 
 module.exports = {
-  entry: path.resolve(`./src/main`),
+  entry: path.resolve(`./index`),
   output: {
     path: path.resolve(`./dist`),
     publicPath: `/dist`,
@@ -18,8 +18,8 @@ module.exports = {
         test: /\.js$/,
         loader: `babel`,
         include: [
+          path.resolve(`./index.js`),
           path.resolve(`./src`),
-          path.resolve(`./node_modules/rxjs-es`),
         ]
       }
     ]

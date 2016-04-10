@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="83px" height="69px" viewBox="0 0 83 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.6.1 (26313) - http://www.bohemiancoding.com/sketch -->
+    <title>cannon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sprite" fill="#21FD1F">
+            <path d="M32.0339807,11.4417606 L39.2369819,11.4417606 L39.2369819,6.9388939e-18 L42.8942168,6.9388939e-18 L42.8942168,11.4417606 L50.0506252,11.4417606 L50.0506252,29.045558 L74.2110232,29.045558 L74.2110232,36.6555084 L82.1258906,36.6555084 L82.9268139,68.2571793 L0.0530803326,68.2571793 L0,36.6555084 L7.79101326,36.6555084 L7.79101326,29.045558 L32.0339807,29.045558 L32.0339807,11.4417606 Z" id="cannon"></path>
+        </g>
+    </g>
+</svg>

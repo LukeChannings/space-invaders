@@ -17,5 +17,6 @@
     "no-unused-vars": [2, { "varsIgnorePattern": "h" }],
     "comma-style": 0,
     "new-parens": 0,
+    "quotes": [1, "backtick"],
   }
 }

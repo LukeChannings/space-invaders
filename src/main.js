@@ -1,56 +1,67 @@
-/* @flow */
-
 import {
   combine,
 } from 'kefir'
 
 import {
+  dimension$,
+  arrow$,
   fps,
-} from './util'
-
-import {
-  dimensions,
-  arrows,
 } from './signals'
 
-type Model = {
-  x: number,
-  y: number,
-  vx: number,
-  vy: number,
-  dir: Direction,
-}
+import {
+  h,
+} from 'virtual-dom'
 
-type Direction = 'Left' | 'Right'
+const {
+  max,
+  min,
+} = Math
 
-const mario: Model = {
-  x: 0,
+const cannon = {
+  x: (window.innerWidth / 2) - 25,
   y: 0,
   vx: 0,
   vy: 0,
-  dir: 'Right',
+  dir: `Right`,
 }
 
-const update = (state: Model, key: Direction): Model => {
+const update = (state, [key, Δ]) => {
+  return [
+    walk(key),
+    physics(Δ),
+  ].reduce((context, f) => f(context), state)
+}
+
+const walk = (key) => (state) => {
   return {
     ...state,
-    dir: key,
+    dir: key.x < 0 ? `Left`
+       : key.x > 0 ? `Right`
+       : state.dir,
+    vx: key.x * 10,
   }
 }
 
-const view = ([[windowWidth, windowHeight], mario]) => {
-  document.body.innerHTML = `<pre>${JSON.stringify({windowWidth, windowHeight, mario}, null, 2)}</pre>`
+const physics = (Δ) => (state) => {
+  return {
+    ...state,
+    x: min(max(0, state.x + Δ * state.vx), window.innerWidth - 50),
+  }
 }
 
+const view = ([[windowWidth, windowHeight], cannon]) =>
+  <div className={`game`} style={`width: ${windowWidth}px; height: ${windowHeight}px`}>
+    <div className={`cannon`} style={`left: ${cannon.x}px; bottom: ${cannon.y}px`}></div>
+  </div>
+
 const delta = fps(30).map((t) => t / 20)
+
 const input =
-  arrows
+  arrow$
     .sampledBy(delta)
-    .concat(delta)
+    .zip(delta)
 
-const main = combine([
-  dimensions,
-  input.scan(update, mario),
+export default combine([
+  dimension$,
+  input.scan(update, cannon),
 ]).map(view)
-
-main.log()
