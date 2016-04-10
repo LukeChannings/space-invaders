@@ -25,7 +25,7 @@ const {
   min,
 } = Math
 
-export default () => {
+export default (persistedState) => {
   const cannon = {
     x: MIDDLE - CANNON_WIDTH / 2,
     y: 0,
@@ -35,7 +35,7 @@ export default () => {
 
   const projectiles = []
 
-  const initialState = {
+  const initialState = persistedState || {
     cannon,
     projectiles,
   }

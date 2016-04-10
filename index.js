@@ -32,6 +32,8 @@ vtree$.onValue((vtree) => {
 })
 
 // persistence
-model$.onValue((model) => {
-  global.localStorage.game = JSON.stringify(model)
-})
+global.save = () => {
+  model$.take(1).onValue((model) => {
+    global.localStorage.game = JSON.stringify(model)
+  })
+}
