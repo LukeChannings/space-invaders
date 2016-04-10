@@ -4,7 +4,17 @@ import {
   patch,
 } from 'virtual-dom'
 
-import vtree$ from './src/main'
+import main from './src/main'
+
+const persistedState =
+  global.localStorage.game
+    ? JSON.parse(global.localStorage.game)
+    : null
+
+const {
+  default: vtree$,
+  model$,
+} = main(persistedState)
 
 const app = document.querySelector(`.app`)
 let rootNode, prevTree
@@ -19,4 +29,9 @@ vtree$.onValue((vtree) => {
   }
 
   prevTree = vtree
+})
+
+// persistence
+model$.onValue((model) => {
+  global.localStorage.game = JSON.stringify(model)
 })
