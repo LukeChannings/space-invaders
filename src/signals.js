@@ -25,7 +25,8 @@ const arrowsHash = {
   40: { y: -1 },
 }
 
-const arrowsInitial = { x: 0, y: 0 }
+const arrowsInitial =
+  { x: 0, y: 0 }
 
 export const arrow$ =
   merge([ keyDown$, keyUp$ ])
@@ -39,4 +40,5 @@ export const arrow$ =
 export const fps = (v) =>
   interval(1000 / v)
     .map(() => Number(new Date))
-    .diff((t1, t2) => t2 - t1)
+    .bufferWithCount(2)
+    .map(([t1, t2]) => t2 - t1)
