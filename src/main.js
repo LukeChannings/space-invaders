@@ -1,117 +1,117 @@
 import {
-  combine,
-} from 'kefir'
-
-import {
   h,
 } from 'virtual-dom'
 
 import {
-  dimension$,
-  arrow$,
-  fps,
-} from './signals'
-
-import {
-  HEIGHT,
-  MIDDLE,
-  CANNON_WIDTH,
-  CANNON_HEIGHT,
-  FRAMES_PER_SECOND,
-} from './constants'
+  fromEvents,
+  combine,
+  interval,
+  repeat,
+  constant,
+} from 'kefir'
 
 const {
   max,
   min,
 } = Math
 
-export default (persistedState) => {
-  const cannon = {
-    x: MIDDLE - CANNON_WIDTH / 2,
-    y: 0,
-    vx: 0,
-    vy: 0
-  }
+const dimension$ =
+  ((currentDimensions) =>
+    fromEvents(window, `resize`)
+      .map(currentDimensions)
+      .toProperty(currentDimensions)
+  )(() => [window.innerWidth, window.innerHeight])
 
-  const projectiles = []
+const keyDown$ = fromEvents(window, `keydown`)
+const keyUp$ = fromEvents(window, `keyup`)
 
-  const initialState = persistedState || {
-    cannon,
-    projectiles,
-  }
+const KEYUP = { x: 0 }
+const LEFT = { x: -1 }
+const RIGHT = { x: 1 }
 
-  const update = (state, [key, Δ]) => {
-    return [
-      move(key),
-      createProjectiles(key),
-      physics(Δ),
-    ].reduce((context, f) => f(context), state)
-  }
+const leftAndRightArrow$ =
+  repeat(() =>
+    keyDown$
+      .filter(({keyCode: k}) => ~[37, 39].indexOf(k))
+      .take(1)
+      .flatMapLatest(({keyCode}) =>
+        interval(16)
+          .map(() => ({ 37: LEFT, 39: RIGHT })[keyCode])
+          .takeUntilBy(
+            keyUp$
+              .filter((e) => e.keyCode === keyCode)
+              .map(() => KEYUP))))
+              .toProperty(() => KEYUP)
 
-  const move = (key) => (state) => {
-    return {
-      ...state,
-      cannon: {
-        ...state.cannon,
-        vx: key.x * 10,
-      },
-    }
-  }
-
-  const createProjectiles = (key) => (state) => {
-    if (key.y > 0 && state.projectiles.length < 2) {
-      return {
-        ...state,
-        projectiles: state.projectiles.concat({
-          y: CANNON_HEIGHT,
-          x: state.cannon.x + CANNON_WIDTH / 2,
-        })
+const cannon$ =
+  constant({ x: 50, y: 0 })
+    .flatMapLatest((initial) => {
+      const update = (cannon, key) => {
+        return {
+          ...cannon,
+          x: max(min(100, cannon.x + key.x), 0),
+        }
       }
-    } else {
-      return state
-    }
-  }
 
-  const physics = (Δ) => (state) => {
-    const projectiles = state.projectiles.reduce((ps, {x, y}) => {
-      const newY = y + 20
-      if (newY > HEIGHT) {
-        return ps
-      } else {
-        return ps.concat({ x, y: newY })
+      return leftAndRightArrow$.scan(update, initial)
+    })
+
+const fireKey$ =
+  repeat(() =>
+    keyDown$
+      .filter((e) => e.keyCode === 38)
+      .throttle(1500, {trailing: false})
+      .map(() => Date.now()))
+
+const projectile$ =
+  combine([ cannon$, fireKey$ ])
+    .flatMap(([cannon, keyup]) =>
+      (Date.now() - keyup) < 5
+        ? interval(100, 1)
+            .take(30)
+            .scan((y, Δ) => y + (Δ * 3.3333), 0)
+            .map((y) => [keyup, cannon.x, y])
+        : false)
+    .withHandler(((() => {
+      const projectiles = {}
+      return (emitter, event) => {
+        if (event.type === `value`) {
+          const [
+            id,
+            x,
+            y,
+          ] = event.value
+
+          projectiles[id] = { x, y }
+
+          emitter.emit(
+            Object
+              .keys(projectiles)
+              .map((k) => projectiles[k])
+              .reduce((ps, p) => ps.concat(p.y === 100 ? [] : p), []))
+        }
       }
-    }, [])
+    })()))
+    .toProperty(() => [])
 
-    const cannon = {
-      ...state.cannon,
-      x: min(max(0, state.cannon.x + Δ * state.cannon.vx), window.innerWidth - 50),
-    }
-
-    return {
-      ...state,
-      cannon,
-      projectiles,
-    }
-  }
-
-  const view = ([[windowWidth, windowHeight], {cannon, projectiles}]) =>
-    <div className={`game`} style={`width: ${windowWidth}px; height: ${windowHeight}px`}>
-      <div className={`cannon`} style={`left: ${cannon.x}px; bottom: ${cannon.y}px`}></div>
-      {projectiles.map(({x, y}) =>
-          <div className={`projectile`} style={{ left: `${x}px`, bottom: `${y}px` }}></div>)}
+const view = ([[width, height], cannon, projectiles]) => {
+  const cannonX = (width - 50) * (cannon.x / 100)
+  return (
+    <div className={`game`} style={{width: `${width}px`, height: `${height}px`}}>
+      <div className={`cannon`} style={{left: `${cannonX}px`}}></div>
+      {projectiles.length && projectiles.map(({x, y}, i) => {
+        const projectileX = width * (x / 100)
+        const projectileY = y < 100 ? 40 + height * (y / 100) : null
+        return (
+          <div key={i} className={`projectile`} style={{left: `${projectileX}px`, bottom: `${projectileY}px`}}></div>
+        )
+      })}
     </div>
-
-  const delta = fps(FRAMES_PER_SECOND).map((t) => t / 20)
-
-  const input =
-    arrow$
-      .sampledBy(delta)
-      .zip(delta)
-
-  const model$ = input.scan(update, initialState)
-
-  return {
-    default: combine([ dimension$, model$ ]).map(view),
-    model$,
-  }
+  )
 }
+
+export default combine([
+  dimension$,
+  cannon$,
+  projectile$,
+]).map(view)
