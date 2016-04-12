@@ -7,7 +7,6 @@ import {
   combine,
   interval,
   repeat,
-  constant,
 } from 'kefir'
 
 const {
@@ -35,7 +34,7 @@ const leftAndRightArrow$ =
     keyDown$
       .filter(({keyCode: k}) => ~[37, 39].indexOf(k))
       .take(1)
-      .flatMapLatest(({keyCode}) =>
+      .flatMap(({keyCode}) =>
         interval(16)
           .map(() => ({ 37: LEFT, 39: RIGHT })[keyCode])
           .takeUntilBy(
@@ -45,16 +44,13 @@ const leftAndRightArrow$ =
                 .toProperty(() => KEYUP)
 
 const cannon$ =
-  constant({ x: 50, y: 0 })
-    .flatMapLatest((initial) => {
-      const update = (cannon, key) => {
-        return {
-          ...cannon,
-          x: max(min(100, cannon.x + key.x), 0),
-        }
+  leftAndRightArrow$
+    .scan((cannon, key) => {
+      return {
+        ...cannon,
+        x: max(min(100, cannon.x + key.x), 0),
       }
-      return leftAndRightArrow$.scan(update, initial)
-    })
+    }, { x: 50, y: 0 })
 
 const fireKey$ =
   repeat(() =>
