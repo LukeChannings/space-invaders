@@ -15,12 +15,13 @@ const {
   min,
 } = Math
 
+const getCurrentDimensions = () =>
+  [window.innerWidth, window.innerHeight]
+
 const dimension$ =
-  ((currentDimensions) =>
-    fromEvents(window, `resize`)
-      .map(currentDimensions)
-      .toProperty(currentDimensions)
-  )(() => [window.innerWidth, window.innerHeight])
+  fromEvents(window, `resize`)
+    .map(getCurrentDimensions)
+    .toProperty(getCurrentDimensions)
 
 const keyDown$ = fromEvents(window, `keydown`)
 const keyUp$ = fromEvents(window, `keyup`)
@@ -41,7 +42,7 @@ const leftAndRightArrow$ =
             keyUp$
               .filter((e) => e.keyCode === keyCode)
               .map(() => KEYUP))))
-              .toProperty(() => KEYUP)
+                .toProperty(() => KEYUP)
 
 const cannon$ =
   constant({ x: 50, y: 0 })
@@ -52,7 +53,6 @@ const cannon$ =
           x: max(min(100, cannon.x + key.x), 0),
         }
       }
-
       return leftAndRightArrow$.scan(update, initial)
     })
 
@@ -103,7 +103,14 @@ const view = ([[width, height], cannon, projectiles]) => {
         const projectileX = width * (x / 100)
         const projectileY = y < 100 ? 40 + height * (y / 100) : null
         return (
-          <div key={i} className={`projectile`} style={{left: `${projectileX}px`, bottom: `${projectileY}px`}}></div>
+          <div
+            key={i}
+            className={`projectile`}
+            style={{
+              left: `${projectileX}px`,
+              bottom: `${projectileY}px`
+            }}>
+          </div>
         )
       })}
     </div>
