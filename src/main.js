@@ -33,8 +33,7 @@ const leftAndRightArrow$ =
   repeat(() =>
     keyDown$
       .filter(({keyCode: k}) => ~[37, 39].indexOf(k))
-      .take(1)
-      .flatMap(({keyCode}) =>
+      .flatMapFirst(({keyCode}) =>
         interval(16)
           .map(() => ({ 37: LEFT, 39: RIGHT })[keyCode])
           .takeUntilBy(
