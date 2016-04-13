@@ -2,7 +2,7 @@ const path = require(`path`)
 const ENV = process.env.NODE_ENV || `development`
 
 module.exports = {
-  entry: path.resolve(`./index`),
+  entry: path.resolve(`./src/main`),
   output: {
     path: path.resolve(`./dist`),
     publicPath: `/dist`,
@@ -21,7 +21,11 @@ module.exports = {
           path.resolve(`./index.js`),
           path.resolve(`./src`),
         ]
-      }
+      },
+      {
+        test: /\.css$/,
+        loader: `style-loader!css-loader?modules`
+      },
     ]
   },
 }
