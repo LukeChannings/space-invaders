@@ -15,7 +15,7 @@ vtree$.onValue((vtree) => {
     app.appendChild(rootNode)
   } else {
     const newTree = diff(prevTree, vtree)
-    window.requestAnimationFrame(() => patch(rootNode, newTree))
+    patch(rootNode, newTree)
   }
 
   prevTree = vtree
