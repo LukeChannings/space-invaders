@@ -14,7 +14,7 @@ const {
 const fps = 60
 const fps$ =
   interval(1000 / fps)
-    .map(() => Date.now())
+    .map(() => global.performance.now())
     .diff((a, b) => b - a)
     .map((Δ) => Δ / 16)
 
@@ -62,20 +62,20 @@ const fireKey$ =
     .throttle(firekeyFrequencyMs, {trailing: false})
     .map(() => global.performance.now())
 
-const projectiles = []
-const projectile$ =
+const cannonProjectiles = []
+const cannonProjectile$ =
   combine([fps$, cannon$, fireKey$])
-    .scan((projectiles, [Δ, cannon, firedTime]) => {
+    .scan((cannonProjectiles, [Δ, cannon, firedTime]) => {
       const isNewProjectile =
         global.performance.now() - firedTime < 5 &&
-        !projectiles.filter(({id}) => firedTime === id).length
+        !cannonProjectiles.filter(({id}) => firedTime === id).length
 
       return [
         ...(isNewProjectile ? [{id: firedTime, x: cannon.x, y: 0}] : []),
-        ...projectiles.reduce((ps, p) =>
+        ...cannonProjectiles.reduce((ps, p) =>
           ceil(p.y) < 100 ? [...ps, { ...p, y: p.y + Δ }] : ps, [])
       ]
-    }, projectiles)
+    }, cannonProjectiles)
 
 const dimensions = () => [window.innerWidth, window.innerHeight]
 const dimension$ =
@@ -83,4 +83,13 @@ const dimension$ =
     .map(dimensions)
     .toProperty(dimensions)
 
-export default combine([ dimension$, cannon$, projectile$ ])
+export default combine([ dimension$, cannon$, cannonProjectile$ ], (...data) => {
+  return {
+    dimensions: {
+      width: data[0][0],
+      height: data[0][1],
+    },
+    cannon: data[1],
+    cannonProjectiles: data[2],
+  }
+})

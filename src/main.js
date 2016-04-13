@@ -7,18 +7,7 @@ import {
 import model$ from './model'
 import view from './view'
 
-const vtree$ =
-  model$
-    .map(([dimensions, cannon, projectiles]) => {
-      return view({
-        dimensions: {
-          width: dimensions[0],
-          height: dimensions[1],
-        },
-        cannon,
-        projectiles,
-      })
-    })
+const vtree$ = model$.map(view)
 
 // side-effects 😱
 

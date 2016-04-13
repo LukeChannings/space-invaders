@@ -5,10 +5,13 @@ import {
 import styles from './view.css'
 
 const projectile = ({width, height}) => ({x, y, id}) => {
+  const cannonWidth = parseInt(styles.cannonWidth, 10)
+  const cannonHeight = parseInt(styles.cannonHeight, 10)
+
   const projectileX =
-    `${x / 100} * ${width}px`
+    `${cannonWidth / 2}px + (${x / 100} * (${width}px - ${cannonWidth}px))`
   const projectileY =
-    `${styles.cannonHeight} + (${y / 100} * (${height}px - ${styles.cannonHeight}))`
+    `${height}px - (${cannonHeight}px + (${y / 100} * ${height - cannonHeight}px))`
 
   return (
     <div
@@ -21,7 +24,7 @@ const projectile = ({width, height}) => ({x, y, id}) => {
   )
 }
 
-export default function view ({ dimensions, cannon, projectiles = [] }) {
+export default function view ({ dimensions, cannon, cannonProjectiles = [] }) {
   const cannonX = `${cannon.x / 100} * (${dimensions.width}px - ${styles.cannonWidth})`
 
   return (
@@ -30,8 +33,7 @@ export default function view ({ dimensions, cannon, projectiles = [] }) {
         className={styles.cannon}
         style={{transform: `translateX(calc(${cannonX}))`}}>
       </div>
-      { projectile(dimensions)({x: 50, y: 0, id: `foo`}) }
-      { projectiles.map(projectile(dimensions)) }
+      { cannonProjectiles.map(projectile(dimensions)) }
     </div>
   )
 }
