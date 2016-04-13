@@ -24,8 +24,13 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: `style-loader!css-loader?modules`
+        loader: `style!css?modules!postcss`
       },
     ]
   },
+  postcss: function () {
+    return [
+      require(`postcss-cssnext`),
+    ]
+  }
 }

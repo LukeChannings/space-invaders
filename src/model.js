@@ -56,7 +56,7 @@ const cannon$ =
     .scan((cannon, {x}) =>
       Object.assign({}, cannon, { x: min(100, max(0, cannon.x + x)) }), cannon)
 
-const firekeyFrequencyMs = 1000
+const firekeyFrequencyMs = 100
 const fireKey$ =
   makeKey$({ key: 38 })
     .throttle(firekeyFrequencyMs, {trailing: false})
