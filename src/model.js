@@ -64,7 +64,7 @@ const cannon$ =
     .scan((cannon, {x}) =>
       Object.assign({}, cannon, { x: min(100, max(0, cannon.x + x)) }), cannon)
 
-const firekeyFrequencyMs = 100
+const firekeyFrequencyMs = 800
 const fireKey$ =
   makeKey$({ key: 38 })
     .throttle(firekeyFrequencyMs, {trailing: false})
@@ -89,6 +89,7 @@ const cannonProjectile$ =
     }, cannonProjectiles)
 
 const invaderDirection = 1
+const invaderSpeed = 30
 const invaderRowCount = 4
 const invadersPerRow = 11
 const invaders =
@@ -97,23 +98,37 @@ const invaders =
       const column = index % invadersPerRow
       const row = floor(index / invadersPerRow)
       return {
-        type: [0, 1, 1, 2][row],
         id: index,
         column,
-        row,
+        type: [0, 1, 1, 2][row],
         x: 10 + ((column / (invadersPerRow - 1)) * 80),
         y: 95 - (row * 10),
       }
     })
 
 const invaders$ =
-  collision$
-    .scan(([invaders, direction], collision = {}) => {
-      if (collision) console.log(collision)
-      return [
-        collision ? invaders.filter(({id}) => id !== collision.invader.id) : invaders,
-        direction,
-      ]
+  combine([fps$, collision$])
+    .scan(([invaders, direction], [Δ, collision]) => {
+      const columns = invaders.map((invader) => invader.column)
+      const hitAnEdge =
+        Boolean(
+          invaders.filter(({column, x}) =>
+            (column === min(...columns) || column === max(...columns)) &&
+            (floor(x) === 0 || ceil(x) === 100)).length)
+
+      const direction_ = hitAnEdge ? +!direction : direction
+
+      const invaders_ =
+        (collision ? invaders.filter(({id}) => id !== collision.invader.id) : invaders)
+          .map((invader) => {
+            return {
+              ...invader,
+              x: invader.x + ((direction_ === 1 ? Δ : -Δ) / invaderSpeed),
+              ...(hitAnEdge ? { y: invader.y - 5 } : {})
+            }
+          })
+
+      return [ invaders_, direction_ ]
     }, [invaders, invaderDirection])
 
 collision$.plug(

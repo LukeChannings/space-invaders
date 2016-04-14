@@ -34,7 +34,7 @@ const Invader = ({width, height}) => ({type, x, y}) => {
     <div
       className={styles[`invaderType${type}`]}
       style={{
-        left: `${width * (x / 100)}px`,
+        left: `${(width - parseInt(invaderWidth, 10)) * (x / 100)}px`,
         bottom: `${(height - parseInt(invaderHeight, 10)) * (y / 100)}px`,
       }}></div>)
 }
