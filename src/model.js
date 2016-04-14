@@ -4,8 +4,6 @@ import {
   interval,
   merge,
   pool,
-  constant,
-  never,
 } from 'kefir'
 
 const {
@@ -18,6 +16,7 @@ import {
   range,
   inRange,
   flatten,
+  get,
 } from 'lodash'
 
 const fps = 60
@@ -75,8 +74,9 @@ const collision$ = pool()
 
 const cannonProjectiles = []
 const cannonProjectile$ =
-  combine([fps$, cannon$, fireKey$])
-    .scan((cannonProjectiles, [Δ, cannon, firedTime]) => {
+  combine([fps$, cannon$, fireKey$, collision$])
+    .scan((cannonProjectiles, [Δ, cannon, firedTime, collision]) => {
+      const collisionId = get(collision, `projectile.id`, NaN)
       const isNewProjectile =
         global.performance.now() - firedTime < 5 &&
         !cannonProjectiles.filter(({id}) => firedTime === id).length
@@ -84,7 +84,7 @@ const cannonProjectile$ =
       return [
         ...(isNewProjectile ? [{id: firedTime, x: cannon.x, y: 0}] : []),
         ...cannonProjectiles.reduce((ps, p) =>
-          ceil(p.y) < 100 ? [...ps, { ...p, y: p.y + Δ }] : ps, [])
+          ceil(p.y) < 100 && p.id !== collisionId ? [...ps, { ...p, y: p.y + Δ }] : ps, [])
       ]
     }, cannonProjectiles)
 
@@ -107,7 +107,7 @@ const invaders$ =
 
 collision$.plug(
   combine([cannonProjectile$, invaders$])
-    .flatMap(([projectiles, invaderRows]) => {
+    .map(([projectiles, invaderRows]) => {
       if (projectiles.length) {
         const collisions =
           flatten(invaderRows.map((row, rowIndex) => {
@@ -132,11 +132,12 @@ collision$.plug(
           }))
 
         if (collisions.length) {
-          return constant(collisions[0])
+          return collisions[0]
         }
       }
-      return never()
-    }))
+      return false
+    })
+    .sampledBy(fps$))
 
 const dimensions = () => [window.innerWidth, window.innerHeight]
 const dimension$ =
