@@ -40,7 +40,7 @@ const Invader = ({width, height}) => ({type, x, y}) => {
       style={{
         left: `${width * (x / 100)}px`,
         bottom: `${(height - parseInt(invaderHeight, 10)) * (y / 100)}px`,
-      }}>{`${x}x`}</div>)
+      }}></div>)
 }
 
 export default function view ({ dimensions, cannon, cannonProjectiles = [], invaderRows }) {

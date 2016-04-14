@@ -48,17 +48,17 @@
 
 .invaderType0 {
   composes: invader;
-  background: red;
+  background: #fff;
 }
 
 .invaderType1 {
   composes: invader;
-  background: green;
+  background: #ccc;
 }
 
 .invaderType2 {
   composes: invader;
-  background: #fff;
+  background: #aaa;
 }
 
 .label {
