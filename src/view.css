@@ -3,6 +3,8 @@
 :root {
   --cannonWidth: 50px;
   --cannonHeight: 50px;
+  --invaderWidth: 50px;
+  --invaderHeight: 50px;
 }
 
 :global(:root),
@@ -34,7 +36,60 @@
   background: #fff;
 }
 
+.invaderRow {
+}
+
+.invader {
+  display: block;
+  width: var(--invaderWidth);
+  height: var(--invaderHeight);
+  position: absolute;
+}
+
+.invaderType0 {
+  composes: invader;
+  background: red;
+}
+
+.invaderType1 {
+  composes: invader;
+  background: green;
+}
+
+.invaderType2 {
+  composes: invader;
+  background: #fff;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 40px;
+  background: white;
+  color: black;
+}
+
+.gameOver {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-transform: uppercase;
+  color: #da5151;
+  font-family: helvetica, sans-serif;
+  font-size: 120px;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 100;
+}
+
 :export {
   cannonWidth: var(--cannonWidth);
   cannonHeight: var(--cannonHeight);
+  invaderWidth: var(--invaderWidth);
+  invaderHeight: var(--invaderHeight);
 }
