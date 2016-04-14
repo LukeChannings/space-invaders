@@ -10,12 +10,12 @@ const {
   max,
   min,
   ceil,
+  floor,
 } = Math
 
 import {
   range,
   inRange,
-  flatten,
   get,
 } from 'lodash'
 
@@ -88,48 +88,52 @@ const cannonProjectile$ =
       ]
     }, cannonProjectiles)
 
+const invaderDirection = 1
+const invaderRowCount = 4
+const invadersPerRow = 11
 const invaders =
-  range(4).map((rowIndex) =>
-    range(11).map((columnIndex) => {
+  range(invaderRowCount * invadersPerRow)
+    .map((_, index) => {
+      const column = index % invadersPerRow
+      const row = floor(index / invadersPerRow)
       return {
-        type: [0, 1, 1, 2][rowIndex],
-        x: 10 + ((columnIndex / 11) * 80),
-        y: 95 - (rowIndex * 10),
+        type: [0, 1, 1, 2][row],
+        id: index,
+        column,
+        row,
+        x: 10 + ((column / (invadersPerRow - 1)) * 80),
+        y: 95 - (row * 10),
       }
-    }))
+    })
+
 const invaders$ =
   collision$
-    .scan((invaderRows, collision = {}) =>
-      invaderRows.map((row, rowIndex) =>
-        (rowIndex === collision.rowIndex
-          ? row.filter((invader) => invader !== collision.invader)
-          : row)), invaders)
+    .scan(([invaders, direction], collision = {}) => {
+      if (collision) console.log(collision)
+      return [
+        collision ? invaders.filter(({id}) => id !== collision.invader.id) : invaders,
+        direction,
+      ]
+    }, [invaders, invaderDirection])
 
 collision$.plug(
   combine([cannonProjectile$, invaders$])
-    .map(([projectiles, invaderRows]) => {
+    .map(([projectiles, [invaders]]) => {
       if (projectiles.length) {
         const collisions =
-          flatten(invaderRows.map((row, rowIndex) => {
-            return row.reduce((collisions, invader) => {
-              const hits = projectiles.filter((projectile) => {
-                if (inRange(projectile.x, invader.x, invader.x + 7) &&
-                    inRange(projectile.y, invader.y, invader.y + 7)) {
-                  return true
-                }
-              })
-              if (hits.length) {
-                return collisions.concat({
-                  time: global.performance.now(),
-                  projectile: hits[0],
-                  invader,
-                  rowIndex,
-                })
-              } else {
-                return collisions
+          invaders.reduce((collisions, invader) => {
+            const projectilesWithHits = projectiles.filter((projectile) => {
+              if (inRange(projectile.x, invader.x, invader.x + 7) &&
+                  inRange(projectile.y, invader.y, invader.y + 7)) {
+                return true
               }
-            }, [])
-          }))
+            })
+
+            const collision = projectilesWithHits.length &&
+              { invader, projectile: projectilesWithHits[0] }
+
+            return collision ? collisions.concat(collision) : collisions
+          }, [])
 
         if (collisions.length) {
           return collisions[0]
@@ -158,6 +162,6 @@ export default combine([
     },
     cannon: data[1],
     cannonProjectiles: data[2],
-    invaderRows: data[3],
+    invaders: data[3][0],
   }
 })

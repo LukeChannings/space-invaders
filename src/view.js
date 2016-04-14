@@ -2,10 +2,6 @@ import {
   h,
 } from 'virtual-dom'
 
-import {
-  flatten,
-} from 'lodash'
-
 import styles, {
   cannonWidth,
   cannonHeight,
@@ -43,9 +39,9 @@ const Invader = ({width, height}) => ({type, x, y}) => {
       }}></div>)
 }
 
-export default function view ({ dimensions, cannon, cannonProjectiles = [], invaderRows }) {
+export default function view ({ dimensions, cannon, cannonProjectiles = [], invaders }) {
   const cannonX = `${cannon.x / 100} * (${dimensions.width}px - ${cannonWidth})`
-  const gameOver = flatten(invaderRows).length === 0
+  const gameOver = invaders.length === 0
   return (
     <div className={styles.game}>
       <div
@@ -53,10 +49,7 @@ export default function view ({ dimensions, cannon, cannonProjectiles = [], inva
         style={{transform: `translateX(calc(${cannonX}))`}}>
       </div>
       { cannonProjectiles.map(Projectile(dimensions)) }
-      { invaderRows.map((invaders) =>
-        <div className={styles.invaderRow}>
-          { invaders.map(Invader(dimensions)) }
-        </div>) }
+      { invaders.map(Invader(dimensions)) }
       {gameOver ? <h1 className={styles.gameOver}>Game Over</h1> : null}
     </div>
   )
