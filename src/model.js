@@ -4,6 +4,8 @@ import {
   interval,
   merge,
   pool,
+  constant,
+  never,
 } from 'kefir'
 
 const {
@@ -63,7 +65,7 @@ const cannon$ =
     .scan((cannon, {x}) =>
       Object.assign({}, cannon, { x: min(100, max(0, cannon.x + x)) }), cannon)
 
-const firekeyFrequencyMs = 1000
+const firekeyFrequencyMs = 100
 const fireKey$ =
   makeKey$({ key: 38 })
     .throttle(firekeyFrequencyMs, {trailing: false})
@@ -73,18 +75,16 @@ const collision$ = pool()
 
 const cannonProjectiles = []
 const cannonProjectile$ =
-  combine([fps$, cannon$, fireKey$], [collision$])
-    .scan((cannonProjectiles, [Δ, cannon, firedTime, collision]) => {
+  combine([fps$, cannon$, fireKey$])
+    .scan((cannonProjectiles, [Δ, cannon, firedTime]) => {
       const isNewProjectile =
         global.performance.now() - firedTime < 5 &&
         !cannonProjectiles.filter(({id}) => firedTime === id).length
 
-      const collidedId = collision && collision.projectile.id
-
       return [
         ...(isNewProjectile ? [{id: firedTime, x: cannon.x, y: 0}] : []),
         ...cannonProjectiles.reduce((ps, p) =>
-          ceil(p.y) < 100 && p.id !== collidedId ? [...ps, { ...p, y: p.y + Δ }] : ps, [])
+          ceil(p.y) < 100 ? [...ps, { ...p, y: p.y + Δ }] : ps, [])
       ]
     }, cannonProjectiles)
 
@@ -98,45 +98,45 @@ const invaders =
       }
     }))
 const invaders$ =
-  combine([collision$])
-    .scan((invaderRows, [collision = {}]) =>
+  collision$
+    .scan((invaderRows, collision = {}) =>
       invaderRows.map((row, rowIndex) =>
-        rowIndex === collision.rowIndex
+        (rowIndex === collision.rowIndex
           ? row.filter((invader) => invader !== collision.invader)
-          : row), invaders)
+          : row)), invaders)
 
-collision$
-  .plug(
-    combine([cannonProjectile$, invaders$])
-      .map(([projectiles, invaderRows]) => {
-        if (projectiles.length) {
-          const collisions =
-            flatten(invaderRows.map((row, rowIndex) => {
-              return row.reduce((collisions, invader) => {
-                const hits = projectiles.filter((projectile) => {
-                  if (inRange(projectile.x, invader.x, invader.x + 7) &&
-                      inRange(projectile.y, invader.y, invader.y + 7)) {
-                    return true
-                  }
-                })
-                if (hits.length) {
-                  return collisions.concat({
-                    time: global.performance.now(),
-                    projectile: hits[0],
-                    invader,
-                    rowIndex,
-                  })
-                } else {
-                  return collisions
+collision$.plug(
+  combine([cannonProjectile$, invaders$])
+    .flatMap(([projectiles, invaderRows]) => {
+      if (projectiles.length) {
+        const collisions =
+          flatten(invaderRows.map((row, rowIndex) => {
+            return row.reduce((collisions, invader) => {
+              const hits = projectiles.filter((projectile) => {
+                if (inRange(projectile.x, invader.x, invader.x + 7) &&
+                    inRange(projectile.y, invader.y, invader.y + 7)) {
+                  return true
                 }
-              }, [])
-            }))
+              })
+              if (hits.length) {
+                return collisions.concat({
+                  time: global.performance.now(),
+                  projectile: hits[0],
+                  invader,
+                  rowIndex,
+                })
+              } else {
+                return collisions
+              }
+            }, [])
+          }))
 
-          if (collisions.length) {
-            return collisions[0]
-          }
+        if (collisions.length) {
+          return constant(collisions[0])
         }
-      }))
+      }
+      return never()
+    }))
 
 const dimensions = () => [window.innerWidth, window.innerHeight]
 const dimension$ =
