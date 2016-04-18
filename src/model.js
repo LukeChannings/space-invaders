@@ -111,10 +111,9 @@ const invaders$ =
     .scan(([invaders, direction], [Δ, collision]) => {
       const columns = invaders.map((invader) => invader.column)
       const hitAnEdge =
-        Boolean(
-          invaders.filter(({column, x}) =>
+          !!invaders.filter(({column, x}) =>
             (column === min(...columns) || column === max(...columns)) &&
-            (floor(x) === 0 || ceil(x) === 100)).length)
+            (floor(x) === 0 || ceil(x) === 100)).length
 
       const direction_ = hitAnEdge ? +!direction : direction
 

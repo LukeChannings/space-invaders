@@ -7,21 +7,16 @@ import {
 import model$ from './model'
 import view from './view'
 
-const vtree$ = model$.map(view)
-
-// side-effects 😱
-
-const app = document.querySelector(`.app`)
-let rootNode, prevTree
-
-vtree$.onValue((vtree) => {
-  if (!rootNode) {
-    rootNode = create(vtree)
-    app.appendChild(rootNode)
-  } else {
-    const newTree = diff(prevTree, vtree)
-    patch(rootNode, newTree)
-  }
-
-  prevTree = vtree
-})
+model$
+  .map(view)
+  .scan(([appNode, currentTree, patches], nextTree) =>
+    !appNode
+      ? [create(nextTree), nextTree]
+      : [appNode, nextTree, diff(currentTree, nextTree)], [])
+  .onValue((app) => {
+    if (!app[0].parentNode) {
+      document.documentElement.appendChild(app[0])
+    } else if (app[2]) {
+      patch(app[0], app[2])
+    }
+  })

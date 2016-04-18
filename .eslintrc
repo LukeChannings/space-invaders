@@ -10,6 +10,9 @@
           "jsx": true
       },
   },
+  "plugins": [
+    "immutable"
+  ],
   "rules": {
     "strict": 0,
     "comma-dangle": [2, "only-multiline"],
@@ -18,5 +21,8 @@
     "comma-style": 0,
     "new-parens": 0,
     "quotes": [1, "backtick"],
+    "immutable/no-let": 2,
+    "immutable/no-this": 2,
+    "immutable/no-mutation": 2
   }
 }
