@@ -29,14 +29,19 @@ const Projectile = ({width, height}) => ({x, y, id}) => {
   )
 }
 
-const Invader = ({width, height}) => ({type, x, y}) =>
-  <div
+const Invader = ({width, height}) => ({type, x, y, area}) => {
+  const invaderWidth = width * (area / 100)
+  const leftEdge = ((x / 100) * width) - (invaderWidth / 2)
+  return (
+    <div
     className={styles[`${type}Invader`]}
     style={{
-      // width: `${(width - 20) / 11}px`,
-      left: `${(width - parseInt(invaderWidth, 10)) * (x / 100)}px`,
-      bottom: `${(height - parseInt(invaderHeight, 10)) * (y / 100)}px`,
-    }}></div>
+      width: `${invaderWidth}px`,
+      height: `50px`,
+      left: `${leftEdge}px`,
+      bottom: `${(y / 100) * height}px`,
+    }}></div>)
+}
 
 const Score = (score) =>
   <div className={styles.score}>

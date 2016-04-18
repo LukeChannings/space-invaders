@@ -20,21 +20,27 @@ import {
   get,
 } from 'lodash'
 
-const focus$ =
+const windowFocused$ =
   merge([
     fromEvents(window, `blur`).map(() => false),
     fromEvents(window, `focus`).map(() => true),
-  ])
-  .toProperty(() => true)
+  ]).toProperty(() => true)
+
+const dimensions = () => [window.innerWidth, window.innerHeight]
+const dimension$ =
+  fromEvents(window, `resize`)
+    .map(dimensions)
+    .toProperty(dimensions)
 
 const fps = 60
 const fps$ =
   repeat(() =>
-    combine([ focus$, interval(1000 / fps) ])
+    combine([ windowFocused$, interval(1000 / fps) ])
       .takeWhile(([focused]) => focused)
       .map(() => global.performance.now())
       .diff((a, b) => b - a)
       .map((Δ) => Δ / 16))
+      // .take(1)
 
 const keyDown$ = fromEvents(window, `keydown`)
 const keyUp$ = fromEvents(window, `keyup`)
@@ -82,7 +88,13 @@ const fireKey$ =
 
 const collision$ = pool()
 
-const cannonProjectiles = []
+const cannonProjectiles = [
+  {
+    x: 80,
+    y: 45,
+    id: performance.now(),
+  }
+]
 const cannonProjectile$ =
   combine([fps$, cannon$, fireKey$, collision$])
     .scan((cannonProjectiles, [Δ, cannon, firedTime, collision]) => {
@@ -102,11 +114,12 @@ const invaderDirection = 1
 const invaderSpeed = 90
 const invaderRowCount = 4
 const invadersPerRow = 11
+const invaderTopOffset = 20
 const invaderTypes =
   [
-    { type: `small`, points: 40 },
-    { type: `medium`, points: 20 },
-    { type: `large`, points: 10 },
+    { type: `small`, points: 40, area: 3 },
+    { type: `medium`, points: 20, area: 4 },
+    { type: `large`, points: 10, area: 5 },
   ]
 
 const invaders =
@@ -118,7 +131,7 @@ const invaders =
         id: index,
         column,
         x: 10 + ((column / (invadersPerRow - 1)) * 80),
-        y: 90 - (row * 10),
+        y: (100 - invaderTopOffset) - (row * 10),
         ...(invaderTypes[[0, 1, 1, 2][row]]),
       }
     })
@@ -154,14 +167,16 @@ const score$ =
       : score, 0)
 
 collision$.plug(
-  combine([cannonProjectile$, invaders$])
-    .map(([projectiles, [invaders]]) => {
+  combine([cannonProjectile$, dimension$, invaders$])
+    .map(([projectiles, [width, height], [invaders]]) => {
       if (projectiles.length) {
         const collisions =
           invaders.reduce((collisions, invader) => {
             const projectilesWithHits = projectiles.filter((projectile) => {
-              if (inRange(projectile.x, invader.x, invader.x + 7) &&
-                  inRange(projectile.y, invader.y, invader.y + 7)) {
+              const offset = invader.area / 2
+              if (inRange(projectile.x, floor(invader.x - offset), ceil(invader.x + offset)) &&
+                  inRange(projectile.y, floor(invader.y - invader.area), ceil(invader.y))) {
+                console.log(projectile, invader)
                 return true
               }
             })
@@ -179,12 +194,6 @@ collision$.plug(
       return false
     })
     .sampledBy(fps$))
-
-const dimensions = () => [window.innerWidth, window.innerHeight]
-const dimension$ =
-  fromEvents(window, `resize`)
-    .map(dimensions)
-    .toProperty(dimensions)
 
 export default combine([
   dimension$,

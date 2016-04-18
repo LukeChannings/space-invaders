@@ -3,8 +3,6 @@
 :root {
   --cannonWidth: 50px;
   --cannonHeight: 50px;
-  --invaderWidth: 50px;
-  --invaderHeight: 50px;
 }
 
 @font-face {
@@ -42,31 +40,29 @@
 
 .projectile {
   position: absolute;
-  width: 2px;
+  width: 1px;
   height: 15px;
-  background: #fff;
+  background: red;
 }
 
 .invader {
   display: block;
-  width: var(--invaderWidth);
-  height: var(--invaderHeight);
   position: absolute;
 }
 
 .smallInvader {
   composes: invader;
-  background: red;
+  background: white;
 }
 
 .mediumInvader {
   composes: invader;
-  background: green;
+  background: white;
 }
 
 .largeInvader {
   composes: invader;
-  background: blue;
+  background: white;
 }
 
 .score {
