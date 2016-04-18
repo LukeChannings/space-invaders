@@ -15,7 +15,7 @@ model$
       : [appNode, nextTree, diff(currentTree, nextTree)], [])
   .onValue((app) => {
     if (!app[0].parentNode) {
-      document.documentElement.appendChild(app[0])
+      document.body.appendChild(app[0])
     } else if (app[2]) {
       patch(app[0], app[2])
     }

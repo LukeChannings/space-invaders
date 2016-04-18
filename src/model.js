@@ -89,9 +89,16 @@ const cannonProjectile$ =
     }, cannonProjectiles)
 
 const invaderDirection = 1
-const invaderSpeed = 30
+const invaderSpeed = 90
 const invaderRowCount = 4
 const invadersPerRow = 11
+const invaderTypes =
+  [
+    { type: `small`, points: 40 },
+    { type: `medium`, points: 20 },
+    { type: `large`, points: 10 },
+  ]
+
 const invaders =
   range(invaderRowCount * invadersPerRow)
     .map((_, index) => {
@@ -100,9 +107,9 @@ const invaders =
       return {
         id: index,
         column,
-        type: [0, 1, 1, 2][row],
         x: 10 + ((column / (invadersPerRow - 1)) * 80),
-        y: 95 - (row * 10),
+        y: 90 - (row * 10),
+        ...(invaderTypes[[0, 1, 1, 2][row]]),
       }
     })
 
@@ -129,6 +136,12 @@ const invaders$ =
 
       return [ invaders_, direction_ ]
     }, [invaders, invaderDirection])
+
+const score$ =
+  collision$.scan((score, collision) =>
+    collision
+      ? collision.invader.points + score
+      : score, 0)
 
 collision$.plug(
   combine([cannonProjectile$, invaders$])
@@ -167,7 +180,8 @@ export default combine([
   dimension$,
   cannon$,
   cannonProjectile$,
-  invaders$
+  invaders$,
+  score$,
 ], (...data) => {
   return {
     dimensions: {
@@ -177,5 +191,6 @@ export default combine([
     cannon: data[1],
     cannonProjectiles: data[2],
     invaders: data[3][0],
+    score: data[4],
   }
 })
