@@ -47,9 +47,6 @@
   background: #fff;
 }
 
-.invaderRow {
-}
-
 .invader {
   display: block;
   width: var(--invaderWidth);
@@ -78,6 +75,12 @@
   top: 20px;
 }
 
+.lives {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
 .scoreText {
   font-family: "04b03";
   font-size: 30px;
@@ -95,7 +98,7 @@
   transform: translate(-50%, -50%);
   text-transform: uppercase;
   color: #da5151;
-  font-family: helvetica, sans-serif;
+  font-family: "04b03";
   font-size: 120px;
   padding: 0;
   margin: 0;

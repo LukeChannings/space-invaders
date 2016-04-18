@@ -4,6 +4,7 @@ import {
   interval,
   merge,
   pool,
+  repeat,
 } from 'kefir'
 
 const {
@@ -19,12 +20,21 @@ import {
   get,
 } from 'lodash'
 
+const focus$ =
+  merge([
+    fromEvents(window, `blur`).map(() => false),
+    fromEvents(window, `focus`).map(() => true),
+  ])
+  .toProperty(() => true)
+
 const fps = 60
 const fps$ =
-  interval(1000 / fps)
-    .map(() => global.performance.now())
-    .diff((a, b) => b - a)
-    .map((Δ) => Δ / 16)
+  repeat(() =>
+    combine([ focus$, interval(1000 / fps) ])
+      .takeWhile(([focused]) => focused)
+      .map(() => global.performance.now())
+      .diff((a, b) => b - a)
+      .map((Δ) => Δ / 16))
 
 const keyDown$ = fromEvents(window, `keydown`)
 const keyUp$ = fromEvents(window, `keyup`)
@@ -64,7 +74,7 @@ const cannon$ =
     .scan((cannon, {x}) =>
       Object.assign({}, cannon, { x: min(100, max(0, cannon.x + x)) }), cannon)
 
-const firekeyFrequencyMs = 800
+const firekeyFrequencyMs = 700
 const fireKey$ =
   makeKey$({ key: 38 })
     .throttle(firekeyFrequencyMs, {trailing: false})

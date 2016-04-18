@@ -33,6 +33,7 @@ const Invader = ({width, height}) => ({type, x, y}) =>
   <div
     className={styles[`${type}Invader`]}
     style={{
+      // width: `${(width - 20) / 11}px`,
       left: `${(width - parseInt(invaderWidth, 10)) * (x / 100)}px`,
       bottom: `${(height - parseInt(invaderHeight, 10)) * (y / 100)}px`,
     }}></div>
@@ -44,12 +45,20 @@ const Score = (score) =>
     </p>
   </div>
 
+const Lives = (lives) =>
+  <div className={styles.lives}>
+    <p className={styles.scoreText}>
+      Lives <span className={styles.scoreValue}>{lives}</span>
+    </p>
+  </div>
+
 export default function view ({ dimensions, cannon, cannonProjectiles = [], invaders, score }) {
   const cannonX = `${cannon.x / 100} * (${dimensions.width}px - ${cannonWidth})`
   const gameOver = invaders.length === 0
   return (
     <div className={styles.game}>
       {Score(score)}
+      {Lives(cannon.lives)}
       <div
         className={styles.cannon}
         style={{transform: `translateX(calc(${cannonX}))`}}>
