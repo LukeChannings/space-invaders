@@ -31,13 +31,14 @@ const Projectile = ({width, height}) => ({x, y, id}) => {
 
 const Invader = ({width, height}) => ({type, x, y, area}) => {
   const invaderWidth = width * (area / 100)
+  const invaderHeight = height * (area / 100)
   const leftEdge = ((x / 100) * width) - (invaderWidth / 2)
   return (
     <div
     className={styles[`${type}Invader`]}
     style={{
       width: `${invaderWidth}px`,
-      height: `50px`,
+      height: `${invaderHeight}px`,
       left: `${leftEdge}px`,
       bottom: `${(y / 100) * height}px`,
     }}></div>)

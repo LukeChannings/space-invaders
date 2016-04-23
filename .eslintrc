@@ -1,17 +1,20 @@
 {
   "extends": [
-    "standard"
+    "standard",
   ],
+  "env": {
+    "browser": true,
+  },
   "parser": "babel-eslint",
   "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "module",
       "ecmaFeatures": {
-          "jsx": true
+          "jsx": true,
       },
   },
   "plugins": [
-    "immutable"
+    "immutable",
   ],
   "rules": {
     "strict": 0,
@@ -23,6 +26,6 @@
     "quotes": [1, "backtick"],
     "immutable/no-let": 2,
     "immutable/no-this": 2,
-    "immutable/no-mutation": 2
+    "immutable/no-mutation": 2,
   }
 }

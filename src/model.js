@@ -37,7 +37,7 @@ const fps$ =
   repeat(() =>
     combine([ windowFocused$, interval(1000 / fps) ])
       .takeWhile(([focused]) => focused)
-      .map(() => global.performance.now())
+      .map(() => performance.now())
       .diff((a, b) => b - a)
       .map((Δ) => Δ / 16))
       // .take(1)
@@ -45,16 +45,16 @@ const fps$ =
 const keyDown$ = fromEvents(window, `keydown`)
 const keyUp$ = fromEvents(window, `keyup`)
 
-const makeKey$ = ({key, up, down, useΔ, useEvent}) =>
+const makeKey$ = ({key, up, down}) =>
     keyDown$
       .filter((e) => e.keyCode === key)
-      .flatMapFirst((e) =>
+      .flatMapFirst(() =>
         fps$
-          .map((Δ) => useΔ ? Δ : useEvent ? e : down)
+          .map(() => down)
           .takeUntilBy(
             keyUp$
               .filter((e) => e.keyCode === key)
-              .map((e) => useΔ ? null : useEvent ? e : up)))
+              .map(() => up)))
 
 const arrowDefault = { x: 0 }
 
@@ -80,27 +80,27 @@ const cannon$ =
     .scan((cannon, {x}) =>
       Object.assign({}, cannon, { x: min(100, max(0, cannon.x + x)) }), cannon)
 
-const firekeyFrequencyMs = 700
+const firekeyFrequencyMs = 100
 const fireKey$ =
   makeKey$({ key: 38 })
     .throttle(firekeyFrequencyMs, {trailing: false})
-    .map(() => global.performance.now())
+    .map(() => performance.now())
 
 const collision$ = pool()
 
 const cannonProjectiles = [
-  {
-    x: 80,
-    y: 45,
-    id: performance.now(),
-  }
+  // {
+  //   x: 44,
+  //   y: 45,
+  //   id: performance.now(),
+  // }
 ]
 const cannonProjectile$ =
   combine([fps$, cannon$, fireKey$, collision$])
     .scan((cannonProjectiles, [Δ, cannon, firedTime, collision]) => {
       const collisionId = get(collision, `projectile.id`, NaN)
       const isNewProjectile =
-        global.performance.now() - firedTime < 5 &&
+        performance.now() - firedTime < 5 &&
         !cannonProjectiles.filter(({id}) => firedTime === id).length
 
       return [
@@ -157,7 +157,7 @@ const invaders$ =
             }
           })
 
-      return [ invaders_, direction_ ]
+      return [invaders_, direction_]
     }, [invaders, invaderDirection])
 
 const score$ =
@@ -167,8 +167,8 @@ const score$ =
       : score, 0)
 
 collision$.plug(
-  combine([cannonProjectile$, dimension$, invaders$])
-    .map(([projectiles, [width, height], [invaders]]) => {
+  combine([cannonProjectile$, invaders$])
+    .map(([projectiles, [invaders]]) => {
       if (projectiles.length) {
         const collisions =
           invaders.reduce((collisions, invader) => {

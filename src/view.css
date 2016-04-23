@@ -7,16 +7,16 @@
 
 @font-face {
 	font-family: "04b03";
-	src: url("/assets/04b03.eot");
-	src: url("/assets/04b03.eot?#iefix") format("embedded-opentype"),
-		url("/assets/04b03.woff2") format("woff2"),
-		url("/assets/04b03.woff") format("woff"),
-		url("/assets/04b03.ttf") format("truetype");
+	src: url(/assets/04b03.eot);
+	src: url(/assets/04b03.eot?#iefix) format("embedded-opentype"),
+		url(/assets/04b03.woff2) format("woff2"),
+		url(/assets/04b03.woff) format("woff"),
+		url(/assets/04b03.ttf) format("truetype");
 	font-weight: normal;
 	font-style: normal;
 }
 
-:global(:root),
+:root,
 :global(.app),
 .game {
   width: 100%;
@@ -40,8 +40,8 @@
 
 .projectile {
   position: absolute;
-  width: 1px;
-  height: 15px;
+  width: 2px;
+  height: 2px;
   background: red;
 }
 
@@ -106,6 +106,4 @@
 :export {
   cannonWidth: var(--cannonWidth);
   cannonHeight: var(--cannonHeight);
-  invaderWidth: var(--invaderWidth);
-  invaderHeight: var(--invaderHeight);
 }
